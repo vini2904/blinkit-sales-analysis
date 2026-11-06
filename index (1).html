@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BlinkIT Grocery Sales Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1d2733;--mute:#66707c;--line:#dfe3e8;--blue:#1f5fa8;--org:#e8891d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--card:#1d242c;--ink:#e6e9ed;--mute:#9aa4af;--line:#323b45;--blue:#5a9be0}}
+:root[data-theme="dark"]{--bg:#14181d;--card:#1d242c;--ink:#e6e9ed;--mute:#9aa4af;--line:#323b45;--blue:#5a9be0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",Arial,Helvetica,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:18px 24px}
+h1{margin:0;font-size:22px}.sub{color:var(--mute);font-size:13px;margin-top:2px}
+main{max-width:1100px;margin:0 auto;padding:8px 20px 40px}
+section{margin-top:28px}
+h2{font-size:17px;margin:0 0 4px;padding-left:10px;border-left:4px solid var(--blue)}
+.note{color:var(--mute);font-size:13.5px;margin:0 0 12px 14px;max-width:820px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.k b{display:block;font-size:22px;font-weight:600}.k span{font-size:12.5px;color:var(--mute)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.c{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:12px 14px;min-width:0}
+.c h3{margin:0 0 8px;font-size:13.5px;font-weight:600}
+.c div{position:relative;height:250px}.c.t div{height:380px}.c.w{grid-column:1/-1}
+.c ul{margin:0;padding-left:20px}.c li{margin:0 0 8px}
+footer{color:var(--mute);font-size:12px;text-align:center;padding:10px 20px 24px}
+</style></head><body>
+<header><h1>BlinkIT Grocery Sales Analysis</h1><div class="sub">Products, outlets and sales · 8,523 item records</div></header>
+<main>
+<section><h2>1. How the business is performing</h2><p class="note" id="n0"></p>
+<div class="kpis" id="k1"></div>
+<div class="g">
+<div class="c t w"><h3>Total sales by item type</h3><div><canvas id="a1"></canvas></div></div>
+<div class="c"><h3>Total sales by outlet type</h3><div><canvas id="a2"></canvas></div></div>
+<div class="c"><h3>Total sales by location tier</h3><div><canvas id="a3"></canvas></div></div>
+<div class="c"><h3>Total sales by outlet size</h3><div><canvas id="a4"></canvas></div></div>
+<div class="c"><h3>Number of items by customer rating</h3><div><canvas id="a5"></canvas></div></div></div></section>
+
+<section><h2>2. Is the data reliable?</h2><p class="note" id="n1"></p>
+<div class="kpis" id="k2"></div></section>
+
+<section><h2>3. What drives sales?</h2><p class="note" id="n2"></p>
+<div class="g">
+<div class="c t w"><h3>Average sales per item, by item type</h3><div><canvas id="b1"></canvas></div></div>
+<div class="c"><h3>Average sales per item, by outlet type</h3><div><canvas id="b2"></canvas></div></div>
+<div class="c"><h3>Average sales per item, by item visibility</h3><div><canvas id="b3"></canvas></div></div>
+<div class="c"><h3>Average sales per item, by weight (kg)</h3><div><canvas id="b4"></canvas></div></div>
+<div class="c"><h3>Average sales per item, by customer rating</h3><div><canvas id="b5"></canvas></div></div></div></section>
+
+<section><h2>4. What should management do?</h2><p class="note" id="n3"></p>
+<div class="g">
+<div class="c"><h3>Total sales by outlet</h3><div><canvas id="c1"></canvas></div></div>
+<div class="c"><h3>Suggestions</h3><ul id="recs"></ul></div></div></section>
+</main>
+<footer>Source: BlinkIT_Grocery_Data.xlsx · The file does not state a currency or time period, so sales are shown as plain numbers</footer>
+<script>
+const D={"n": 8523, "tot": 1201681, "avg": 140.99278338613166, "rate": 3.965857092573038, "prod": 1559, "outs": 10, "it": {"n": ["Fruits and Vegetables", "Snack Foods", "Household", "Frozen Foods", "Dairy", "Canned", "Baking Goods", "Health and Hygiene", "Meat", "Soft Drinks", "Breads", "Hard Drinks", "Others", "Starchy Foods", "Breakfast", "Seafood"], "s": [178124, 175434, 135977, 118559, 101276, 90707, 81895, 68026, 59450, 58514, 35379, 29335, 22452, 21880, 15597, 9078], "a": [144.6, 146.2, 149.4, 138.5, 148.5, 139.8, 126.4, 130.8, 139.9, 131.5, 141.0, 137.1, 132.9, 147.8, 141.8, 141.8], "c": [1232, 1200, 910, 856, 682, 649, 648, 520, 425, 445, 251, 214, 169, 148, 110, 64]}, "ot": {"n": ["Supermarket Type1", "Grocery Store", "Supermarket Type2", "Supermarket Type3"], "s": [787550, 151939, 131478, 130715], "a": [141.2, 140.3, 141.7, 139.8], "c": [5577, 1083, 928, 935]}, "lo": {"n": ["Tier 3", "Tier 2", "Tier 1"], "s": [472133, 393151, 336398], "a": [140.9, 141.2, 140.9], "c": [3350, 2785, 2388]}, "sz": {"n": ["Medium", "Small", "High"], "s": [507896, 444794, 248992], "a": [139.9, 141.7, 142.0], "c": [3631, 3139, 1753]}, "ou": {"n": ["OUT035", "OUT046", "OUT013", "OUT018", "OUT045", "OUT027", "OUT049", "OUT017", "OUT010", "OUT019"], "s": [133104, 132113, 131809, 131478, 130943, 130715, 130477, 129104, 78132, 73808], "a": [143.1, 142.1, 141.4, 141.7, 141.0, 139.8, 140.3, 139.4, 140.8, 139.8], "c": [930, 930, 932, 928, 929, 935, 930, 926, 555, 528]}, "vis": {"n": ["0–3%", "3–6%", "6–10%", "Over 10%"], "a": [140.2, 139.1, 146.9, 138.3], "c": [2368, 2290, 1935, 1930]}, "wt": {"n": ["Under 8", "8–12", "12–16", "Over 16"], "a": [138.6, 140.9, 141.0, 143.4], "c": [1401, 1801, 1735, 2123]}, "rt": {"n": ["3 or below", "3.1–3.5", "3.6–4.0", "4.1–4.5", "4.6–5.0"], "a": [139.0, 139.7, 142.2, 139.7, 140.9], "c": [617, 479, 4255, 2487, 685]}, "dq": {"miss": 1463, "missp": 17.2, "dup": 0, "outl": 0, "fixed": 545, "zv": 526}, "notes": ["8,523 items listed across 1,559 products, 16 item types and 10 outlets. Total sales are 1,201,681, about 141 per item. Fruits and Vegetables and Snack Foods are the two biggest item types, together 29% of sales.", "Before analysing, the data was checked and cleaned. Fat content was written five different ways, so it was combined into two (Low Fat, Regular). The weight column is the main gap.", "Average sales per item are almost the same everywhere, roughly 140 to 142 across outlet types. Visibility, weight and rating show almost no link with sales (correlations of 0.00, 0.03 and 0.01). Bigger totals come from selling more items, not from higher sales per item.", "Highest totals: OUT035 and OUT046. Lowest: OUT019 and OUT010, which carry about 542 items each against roughly 930 for the others."], "recs": ["Grocery stores (OUT019, OUT010) sell about 542 items each, against about 930 at the other outlets. Their sales per item are normal, so a wider range there is the clearest way to lift totals.", "Keep Fruits and Vegetables and Snack Foods well stocked, since they bring in the most sales. Baking Goods has the lowest sales per item (126), and Health and Hygiene is next (131). Prices or pack sizes in these types are worth a look.", "Smaller item types (Seafood, Breakfast) sell little in total but their sales per item are in line with the rest. They are small ranges, not weak products.", "Fix the data at source: weight is missing for 1,463 items, mostly at OUT027 and OUT019, and 526 items have a visibility of exactly zero, which looks like an entry error.", "Don’t spend money chasing higher visibility or ratings on the basis of this data alone. Neither moves sales per item here."]};
+const cs=getComputedStyle(document.documentElement),v=n=>cs.getPropertyValue(n).trim();
+const B=v('--blue'),O=v('--org'),T=v('--mute'),L=v('--line');
+Chart.defaults.font.family='"Segoe UI",Arial,sans-serif';Chart.defaults.color=T;Chart.defaults.maintainAspectRatio=false;
+const num=x=>Math.round(x).toLocaleString('en-IN');
+['n0','n1','n2','n3'].forEach((id,i)=>document.getElementById(id).textContent=D.notes[i]);
+document.getElementById('recs').innerHTML=D.recs.map(r=>`<li>${r}</li>`).join('');
+const kp=(id,a)=>document.getElementById(id).innerHTML=a.map(x=>`<div class="k"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+kp('k1',[['Total sales',num(D.tot)],['Items sold',num(D.n)],['Average sales per item',D.avg.toFixed(1)],['Average rating',D.rate.toFixed(2)+' / 5'],['Different products',num(D.prod)],['Outlets',D.outs]]);
+const q=D.dq;
+kp('k2',[['Weight missing',num(q.miss)+' ('+q.missp+'%)'],['Duplicate rows',q.dup],['Unusually high or low sales',q.outl],['Fat content labels fixed',q.fixed],['Items with zero visibility',q.zv]]);
+const grid={color:L};
+const ds=(l,d,c)=>({label:l,data:d,backgroundColor:c});
+const vert=(id,labels,data,c,fmt)=>new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[ds('',data,c)]},options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid,beginAtZero:true,ticks:{callback:v=>fmt?fmt(v):v}}}}});
+const horiz=(id,labels,data,c)=>new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets:[ds('',data,c)]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid,beginAtZero:true,ticks:{callback:v=>v>=1e5?(v/1e5)+' L':v}},y:{grid:{display:false}}}}});
+const lakh=x=>x>=1e5?(x/1e5)+' L':x;
+horiz('a1',D.it.n,D.it.s,B);
+vert('a2',D.ot.n,D.ot.s,B,lakh);vert('a3',D.lo.n,D.lo.s,B,lakh);vert('a4',D.sz.n,D.sz.s,B,lakh);
+vert('a5',D.rt.n,D.rt.c,B);
+horiz('b1',D.it.n,D.it.a,O);
+vert('b2',D.ot.n,D.ot.a,O);vert('b3',D.vis.n,D.vis.a,O);vert('b4',D.wt.n,D.wt.a,O);vert('b5',D.rt.n,D.rt.a,O);
+horiz('c1',D.ou.n,D.ou.s,B);
+</script></body></html>
